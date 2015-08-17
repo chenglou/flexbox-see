@@ -40,26 +40,17 @@ const flexChild = {
 const defParent = mapObj(flexParent, val => val[0]);
 const defChild = mapObj(flexChild, val => val[0]);
 
-function construct(currStruct, prop, selectedChild, handleParentClick, handleChildClick) {
+function construct(currStruct, selectedChild, prop, handleParentClick, handleChildClick) {
   const {children, ...rest} = currStruct;
-  const [name, val] = prop;
-  let propParent;
-  let propChild;
-  if (selectedChild == null) {
-    propParent = prop;
-    propChild = ['alignSelf', 'flex-start'];
-  } else {
-    propParent = ['flexDirection', 'row'];
-    propChild = prop;
-  }
   return (
-    <div style={rest} onClick={handleParentClick.bind(null, currStruct, null, propParent)}>
-      <pre style={{}}>{JSON.stringify(rest, null, 2)}</pre>
+    <div style={rest} onClick={handleParentClick.bind(null, currStruct, null)}>
+      {selectedChild == null && rest[prop[0]]}
       {children.map((childStyle, i) => {
         return (
           <div
             style={childStyle}
-            onClick={handleChildClick.bind(null, currStruct, i, propChild)}>
+            onClick={handleChildClick.bind(null, currStruct, i)}>
+            {selectedChild != null && children[i][prop[0]]}
           </div>
         );
       })}
@@ -85,7 +76,7 @@ const Demo = React.createClass({
     };
   },
 
-  handleParentClick(altStruct, selectedChild, altProp, e) {
+  handleParentClick(altStruct, selectedChild, e) {
     e.stopPropagation();
     this.setState({
       currStruct: altStruct,
@@ -94,7 +85,7 @@ const Demo = React.createClass({
     });
   },
 
-  handleChildClick(altStruct, selectedChild, altProp, e) {
+  handleChildClick(altStruct, selectedChild, e) {
     e.stopPropagation();
     this.setState({
       currStruct: altStruct,
@@ -113,7 +104,7 @@ const Demo = React.createClass({
       <div style={{width: '100vw', height: '100vh'}}>
         <pre style={{height: 175}}>{JSON.stringify(focused, null, 2)}</pre>
         <div style={{width: '100%', height: 300, display: 'flex', justifyContent: 'center', outline: '4px solid blue'}}>
-          {construct(currStruct, prop, selectedChild, this.handleParentClick, this.handleChildClick)}
+          {construct(currStruct, selectedChild, prop, this.handleParentClick, this.handleChildClick)}
         </div>
 
         <div style={{transform: 'scale(1)', width: '100%', height: 300, display: 'flex', justifyContent: 'center', outline: '1px solid red'}}>
@@ -124,7 +115,7 @@ const Demo = React.createClass({
             } else {
               altStruct.children[selectedChild][prop[0]] = v;
             }
-            return construct(altStruct, [prop[0], v], selectedChild, this.handleParentClick, this.handleChildClick);
+            return construct(altStruct, selectedChild, prop, this.handleParentClick, this.handleChildClick);
           })}
         </div>
       </div>
