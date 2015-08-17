@@ -1,0 +1,33 @@
+{
+  "name": "flexbox-see",
+  "version": "0.0.0",
+  "description": "Flexbox visualizer.",
+  "main": "src/index.js",
+  "devDependencies": {
+    "babel": "^5.6.14",
+    "babel-core": "^5.6.18",
+    "babel-eslint": "^3.1.23",
+    "babel-loader": "^5.3.1",
+    "eslint": "^0.24.1",
+    "eslint-config-airbnb": "0.0.6",
+    "eslint-loader": "^0.14.1",
+    "eslint-plugin-react": "^2.7.0",
+    "react": "^0.14.0-beta3",
+    "react-dom": "0.14.0-beta3",
+    "react-hot-loader": "^1.2.8",
+    "webpack": "^1.10.1",
+    "webpack-dev-server": "^1.10.1"
+  },
+  "scripts": {
+    "start": "NODE_ENV=development node server.js",
+    "build": "NODE_ENV=production webpack -p",
+    "lint": "eslint --ext .js,.jsx ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chenglou/flexbox-see.git"
+  },
+  "keywords": [],
+  "author": "chenglou",
+  "license": "MIT"
+}
