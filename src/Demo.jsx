@@ -11,7 +11,7 @@ function mapObj(o, f) {
 // flexFlow for wrap + direction
 // flex for grow + shrink + basis
 
-const flex = {
+const flexParent = {
   display: ['flex', 'inline-flex'],
   flexDirection: ['row', 'row-reverse', 'column', 'column-reverse'],
   flexWrap: ['nowrap', 'wrap', 'wrap-reverse'],
@@ -19,6 +19,12 @@ const flex = {
   alignItems: ['flex-start', 'flex-end', 'center', 'stretch', 'baseline'],
   alignContent: ['flex-start', 'flex-end', 'center', 'stretch', 'space-between', 'space-around'],
 
+  height: [30],
+  width: [50],
+  outline: ['1px solid'],
+};
+
+const flexChild = {
   // order: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   flexGrow: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
   flexShrink: [1, 0, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -31,15 +37,29 @@ const flex = {
   outline: ['1px solid'],
 };
 
-const def = mapObj(flex, val => val[0]);
+const defParent = mapObj(flexParent, val => val[0]);
+const defChild = mapObj(flexChild, val => val[0]);
 
-function construct(currStruct, prop, handleClick) {
+function construct(currStruct, prop, selectedChild, handleParentClick, handleChildClick) {
   const {children, ...rest} = currStruct;
+  const [name, val] = prop;
+  let propParent;
+  let propChild;
+  if (selectedChild == null) {
+    propParent = prop;
+    propChild = ['alignSelf', 'flex-start'];
+  } else {
+    propParent = ['flexDirection', 'row'];
+    propChild = prop;
+  }
   return (
-    <div style={rest} onClick={handleClick.bind(null, currStruct, null, prop)}>
+    <div style={rest} onClick={handleParentClick.bind(null, currStruct, null, propParent)}>
+      <pre style={{}}>{JSON.stringify(rest, null, 2)}</pre>
       {children.map((childStyle, i) => {
         return (
-          <div style={childStyle} onClick={handleClick.bind(null, currStruct, i, prop)}>
+          <div
+            style={childStyle}
+            onClick={handleChildClick.bind(null, currStruct, i, propChild)}>
           </div>
         );
       })}
@@ -55,21 +75,30 @@ const Demo = React.createClass({
   getInitialState() {
     return {
       currStruct: {
-        ...def,
+        ...defParent,
         height: 200,
         width: 400,
-        children: [def, def, def],
+        children: [defChild, defChild, defChild],
       },
       selectedChild: null,
       prop: ['flexDirection', 'row'],
     };
   },
 
-  handleClick(altStruct, selectedChild, altProp, e) {
+  handleParentClick(altStruct, selectedChild, altProp, e) {
     e.stopPropagation();
     this.setState({
       currStruct: altStruct,
-      prop: altProp,
+      prop: ['flexDirection', altStruct.flexDirection],
+      selectedChild: selectedChild,
+    });
+  },
+
+  handleChildClick(altStruct, selectedChild, altProp, e) {
+    e.stopPropagation();
+    this.setState({
+      currStruct: altStruct,
+      prop: ['alignSelf', altStruct.children[selectedChild].alignSelf],
       selectedChild: selectedChild,
     });
   },
@@ -78,12 +107,13 @@ const Demo = React.createClass({
     const {currStruct, selectedChild, prop} = this.state;
 
     const {children, ...focused} = selectedChild == null ? currStruct : currStruct.children[selectedChild];
-    const toChange = flex[prop[0]];
+    const toChange = selectedChild === null ? flexParent[prop[0]] : flexChild[prop[0]];
+
     return (
       <div style={{width: '100vw', height: '100vh'}}>
-        <pre>{JSON.stringify(focused, null, 2)}</pre>
+        <pre style={{height: 175}}>{JSON.stringify(focused, null, 2)}</pre>
         <div style={{width: '100%', height: 300, display: 'flex', justifyContent: 'center', outline: '4px solid blue'}}>
-          {construct(currStruct, prop, this.handleClick)}
+          {construct(currStruct, prop, selectedChild, this.handleParentClick, this.handleChildClick)}
         </div>
 
         <div style={{transform: 'scale(1)', width: '100%', height: 300, display: 'flex', justifyContent: 'center', outline: '1px solid red'}}>
@@ -94,7 +124,7 @@ const Demo = React.createClass({
             } else {
               altStruct.children[selectedChild][prop[0]] = v;
             }
-            return construct(altStruct, [prop[0], v], this.handleClick);
+            return construct(altStruct, [prop[0], v], selectedChild, this.handleParentClick, this.handleChildClick);
           })}
         </div>
       </div>
