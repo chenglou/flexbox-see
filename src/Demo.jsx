@@ -19,8 +19,8 @@ const flexParent = {
   alignItems: ['flex-start', 'flex-end', 'center', 'stretch', 'baseline'],
   alignContent: ['flex-start', 'flex-end', 'center', 'stretch', 'space-between', 'space-around'],
 
-  height: [30],
-  width: [50],
+  height: [180],
+  width: [300],
   outline: ['1px solid'],
 };
 
@@ -32,8 +32,8 @@ const flexChild = {
 
   alignSelf: ['flex-start', 'flex-end', 'center', 'stretch', 'baseline'],
 
-  height: [30],
-  width: [50],
+  height: [40],
+  width: [60],
   outline: ['1px solid'],
 };
 
@@ -43,12 +43,20 @@ const defChild = mapObj(flexChild, val => val[0]);
 function construct(currStruct, selectedChild, prop, handleParentClick, handleChildClick) {
   const {children, ...rest} = currStruct;
   return (
-    <div style={rest} onClick={handleParentClick.bind(null, currStruct, null)}>
+    <div
+      style={{
+        backgroundColor: selectedChild == null ? 'lightpink' : 'white',
+        ...rest,
+      }}
+      onClick={handleParentClick.bind(null, currStruct, null)}>
       {selectedChild == null && rest[prop[0]]}
       {children.map((childStyle, i) => {
         return (
           <div
-            style={childStyle}
+            style={{
+              backgroundColor: selectedChild === i ? 'lightpink' : 'white',
+              ...childStyle,
+            }}
             onClick={handleChildClick.bind(null, currStruct, i)}>
             {selectedChild != null && children[i][prop[0]]}
           </div>
@@ -67,8 +75,6 @@ const Demo = React.createClass({
     return {
       currStruct: {
         ...defParent,
-        height: 200,
-        width: 400,
         children: [defChild, defChild, defChild],
       },
       selectedChild: null,
@@ -76,12 +82,12 @@ const Demo = React.createClass({
     };
   },
 
-  handleParentClick(altStruct, selectedChild, e) {
+  handleParentClick(altStruct, _, e) {
     e.stopPropagation();
     this.setState({
       currStruct: altStruct,
       prop: ['flexDirection', altStruct.flexDirection],
-      selectedChild: selectedChild,
+      selectedChild: null,
     });
   },
 
@@ -102,8 +108,23 @@ const Demo = React.createClass({
 
     return (
       <div style={{width: '100vw', height: '100vh'}}>
-        <pre style={{height: 175}}>{JSON.stringify(focused, null, 2)}</pre>
-        <div style={{width: '100%', height: 300, display: 'flex', justifyContent: 'center', outline: '4px solid blue'}}>
+        <div style={{height: 200}}>
+          {Object.keys(focused).map(key => {
+            return (
+              <div onClick={this.handlePropClick.bind(null, key)}>
+                <span>{key}</span>: <span>{focused[key]}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{
+          width: '100%',
+          height: 200,
+          display: 'flex',
+          justifyContent: 'center',
+          outline: '4px solid blue',
+        }}>
           {construct(currStruct, selectedChild, prop, this.handleParentClick, this.handleChildClick)}
         </div>
 
