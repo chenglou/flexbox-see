@@ -33,7 +33,7 @@ const flexChild = {
   alignSelf: ['flex-start', 'flex-end', 'center', 'stretch', 'baseline'],
 
   height: [40],
-  width: [60],
+  width: [70],
   outline: ['1px solid'],
 };
 
@@ -42,26 +42,34 @@ const defChild = mapObj(flexChild, val => val[0]);
 
 function construct(currStruct, selectedChild, prop, handleParentClick, handleChildClick) {
   const {children, ...rest} = currStruct;
+
   return (
-    <div
-      style={{
-        backgroundColor: selectedChild == null ? 'lightpink' : 'white',
-        ...rest,
-      }}
-      onClick={handleParentClick.bind(null, currStruct, null)}>
-      {selectedChild == null && rest[prop[0]]}
-      {children.map((childStyle, i) => {
-        return (
-          <div
-            style={{
-              backgroundColor: selectedChild === i ? 'lightpink' : 'white',
-              ...childStyle,
-            }}
-            onClick={handleChildClick.bind(null, currStruct, i)}>
-            {selectedChild != null && children[i][prop[0]]}
-          </div>
-        );
-      })}
+    <div>
+      <div style={{position: 'absolute'}}>
+        {selectedChild == null && rest[prop[0]]}
+      </div>
+
+      <div
+        style={{
+          backgroundColor: selectedChild == null ? 'lightpink' : 'white',
+          ...rest,
+        }}
+        onClick={handleParentClick.bind(null, currStruct, null)}>
+        {children.map((childStyle, i) => {
+          return (
+            <div
+              style={{
+                backgroundColor: selectedChild === i ? 'lightpink' : 'white',
+                ...childStyle,
+              }}
+              onClick={handleChildClick.bind(null, currStruct, i)}>
+              <div style={{position: 'absolute'}}>
+                {selectedChild != null && children[i][prop[0]]}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -75,7 +83,7 @@ const Demo = React.createClass({
     return {
       currStruct: {
         ...defParent,
-        children: [defChild, defChild, defChild],
+        children: [defChild, defChild, defChild, defChild, defChild],
       },
       selectedChild: null,
       prop: ['flexDirection', 'row'],
@@ -115,27 +123,39 @@ const Demo = React.createClass({
 
     return (
       <div style={{width: '100vw', height: '100vh'}}>
-        <div style={{height: 200}}>
-          {Object.keys(focused).map(key => {
-            return (
-              <div onClick={this.handlePropClick.bind(null, key)}>
-                <span>{key}</span>: <span>{focused[key]}</span>
-              </div>
-            );
-          })}
-        </div>
-
         <div style={{
           width: '100%',
           height: 200,
           display: 'flex',
-          justifyContent: 'center',
-          outline: '4px solid blue',
+          justifyContent: 'space-between',
+          backgroundColor: '#D6E2D6',
         }}>
+          <div style={{height: 200}}>
+            {Object.keys(focused).map(key => {
+              return (
+                <div
+                  onClick={this.handlePropClick.bind(null, key)}
+                  style={{backgroundColor: key === prop[0] ? 'lightpink' : 'white'}}
+                  >
+                  <span>{key}</span>
+                  {': '}
+                  <span>
+                    {focused[key]}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
           {construct(currStruct, selectedChild, prop, this.handleParentClick, this.handleChildClick)}
         </div>
 
-        <div style={{transform: 'scale(1)', width: '100%', height: 300, display: 'flex', justifyContent: 'center', outline: '1px solid red'}}>
+        <div style={{transform: 'scale(1)',
+          width: '100%',
+          display: 'flex',
+          // justifyContent: 'center',
+          flexWrap: 'wrap',
+        }}>
           {toChange.filter(v => v !== prop[1]).map(v => {
             let altStruct = clone(currStruct);
             if (selectedChild == null) {
