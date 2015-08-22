@@ -100,6 +100,13 @@ const Demo = React.createClass({
     });
   },
 
+  handlePropClick(key) {
+    const {selectedChild} = this.state;
+    this.setState({
+      prop: [key, selectedChild == null ? flexParent[key][0] : flexChild[key][0]],
+    });
+  },
+
   render() {
     const {currStruct, selectedChild, prop} = this.state;
 
